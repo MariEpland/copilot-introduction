@@ -1,0 +1,59 @@
+-- ============================================================
+-- Exercise 02 — DAX Measure Challenges: Reference Solutions
+-- ============================================================
+-- These are one correct way to write each measure.
+-- DAX often has multiple valid approaches — if yours works
+-- and returns the right result, it's a valid answer.
+-- ============================================================
+
+
+-- Challenge 1: Total Revenue
+-- SUMX iterates over the Orders table and multiplies quantity by unit_price for each row.
+Total Revenue =
+SUMX(
+    Orders,
+    Orders[quantity] * Orders[unit_price]
+)
+
+
+-- Challenge 2: Filtered Revenue with CALCULATE
+-- CALCULATE evaluates [Total Revenue] inside a modified filter context
+-- where Orders[region] is forced to "North", overriding any slicer selection.
+North Revenue =
+CALCULATE(
+    [Total Revenue],
+    Orders[region] = "North"
+)
+
+
+-- Challenge 3: Year-to-Date Revenue
+-- TOTALYTD accumulates [Total Revenue] from the first day of the year
+-- through the last date in the current filter context.
+YTD Revenue =
+TOTALYTD(
+    [Total Revenue],
+    Orders[order_date]
+)
+
+
+-- Challenge 4: Product Revenue Rank
+-- RANKX iterates over ALL products (ignoring any product filter),
+-- computes [Total Revenue] for each, and returns the rank for the current product.
+Product Revenue Rank =
+RANKX(
+    ALL(Orders[product]),
+    [Total Revenue],
+    ,
+    DESC,
+    Dense
+)
+
+
+-- Challenge 5: Average Order Value (safe division)
+-- DIVIDE(numerator, denominator) returns BLANK() when denominator is 0,
+-- instead of raising a division-by-zero error.
+Avg Order Value =
+DIVIDE(
+    [Total Revenue],
+    COUNTROWS(Orders)
+)

@@ -42,7 +42,7 @@ Work through these in order. Each exercise has its own `README.md` with step-by-
 | # | Folder | Title | What you'll practise |
 |---|--------|-------|----------------------|
 | 01 | `exercises/01-first-contact/` | First Contact | Inline completions + Copilot Chat basics |
-| 02 | `exercises/02-sql-assistant/` | SQL Assistant | Generate & optimise SQL queries |
+| 02 | `exercises/02-dax-assistant/` | DAX Assistant | Write DAX measures for a Power BI data model |
 | 03 | `exercises/03-custom-instructions/` | Custom Instructions | Teach Copilot about your project |
 | 04 | `exercises/04-github-features/` | GitHub.com Features | Copilot on pull requests & issues |
 | 05 | `exercises/05-skills/` | Skills & Slash Commands | `/explain`, `/fix`, `/tests`, `@workspace` |

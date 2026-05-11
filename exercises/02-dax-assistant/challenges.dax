@@ -1,0 +1,68 @@
+-- ============================================================
+-- Exercise 02 — DAX Measure Challenges
+-- ============================================================
+-- For each challenge, use Copilot Chat to write the DAX measure.
+-- Paste your answer below each comment block.
+-- Reference data model is in data_model.md.
+--
+-- NOTE: DAX measures are defined with the syntax:
+--   Measure Name = <DAX expression>
+-- ============================================================
+
+
+-- ------------------------------------------------------------
+-- Challenge 1: Total Revenue
+-- Business requirement:
+--   Calculate total revenue across all orders.
+--   Revenue per order = Orders[quantity] * Orders[unit_price]
+--   Hint: SUMX iterates over a table row by row.
+-- ------------------------------------------------------------
+
+Total Revenue = 
+
+
+-- ------------------------------------------------------------
+-- Challenge 2: Filtered Revenue with CALCULATE
+-- Business requirement:
+--   Create a measure that shows revenue for the North region only,
+--   regardless of any region filter applied in the report.
+--   Hint: CALCULATE changes the filter context.
+-- ------------------------------------------------------------
+
+North Revenue = 
+
+
+-- ------------------------------------------------------------
+-- Challenge 3: Year-to-Date Revenue
+-- Business requirement:
+--   Show cumulative revenue from the start of the current year
+--   up to the latest date in the current filter context.
+--   Hint: TOTALYTD is a time intelligence function that needs
+--   a date column and a measure.
+-- ------------------------------------------------------------
+
+YTD Revenue = 
+
+
+-- ------------------------------------------------------------
+-- Challenge 4: Product Revenue Rank
+-- Business requirement:
+--   Rank each product by its Total Revenue, where rank 1 is
+--   the highest revenue. The rank should update dynamically
+--   based on the current filter context.
+--   Hint: RANKX iterates over a table and compares values.
+-- ------------------------------------------------------------
+
+Product Revenue Rank = 
+
+
+-- ------------------------------------------------------------
+-- Challenge 5: Average Order Value (safe division)
+-- Business requirement:
+--   Calculate the average revenue per order (Total Revenue / number of orders).
+--   Make sure the measure returns BLANK() instead of an error
+--   when there are no orders.
+--   Hint: DIVIDE handles divide-by-zero gracefully.
+-- ------------------------------------------------------------
+
+Avg Order Value = 
