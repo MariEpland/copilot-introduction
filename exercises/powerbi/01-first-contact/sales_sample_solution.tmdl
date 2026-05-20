@@ -1,0 +1,162 @@
+table sales_sample
+	lineageTag: a4650602-f09c-452b-a87b-131ee839bb23
+
+	/// Total sales revenue calculated as quantity × unit price
+	measure 'Total Sales' = SUMX(sales_sample, sales_sample[quantity] * VALUE(sales_sample[unit_price]))
+		formatString: "$"#,0.00
+		lineageTag: 66381160-ea82-4a38-9446-cdbeb893066f
+
+	/// ============================================================================
+	/// Exercise 01 - SOLUTION
+	/// ============================================================================
+
+	/// Total quantity
+	/// Calculates the total quantity of all products sold
+	measure 'Total Quantity' = SUM(sales_sample[quantity])
+		formatString: #,0
+		lineageTag: 10000000-0000-0000-0000-000000000002
+
+	/// Orders by Region
+	/// Count the number of orders for the current region filter context
+	measure 'Orders by Region' = COUNTROWS(sales_sample)
+		formatString: #,0
+		lineageTag: 10000000-0000-0000-0000-000000000003
+
+	/// Average Order Value
+	/// Calculate the average revenue per order
+	measure 'Average Order Value' = DIVIDE([Total Sales], DISTINCTCOUNT(sales_sample[order_id]), 0)
+		formatString: "$"#,0.00
+		lineageTag: 10000000-0000-0000-0000-000000000004
+
+	/// ============================================================================
+	/// Stretch Goals - Time Intelligence (SOLUTION)
+	/// ============================================================================
+
+	/// Previous Month Revenue
+	/// Calculate revenue for the previous month
+	measure 'Previous Month Revenue' =
+			CALCULATE(
+			    [Total Sales],
+			    DATEADD(sales_sample[order_date], -1, MONTH)
+			)
+		formatString: "$"#,0.00
+		lineageTag: 10000000-0000-0000-0000-000000000005
+
+	/// Year-to-Date Revenue
+	/// Calculate year-to-date revenue using TOTALYTD
+	measure 'YTD Revenue' =
+			TOTALYTD(
+			    [Total Sales],
+			    sales_sample[order_date]
+			)
+		formatString: "$"#,0.00
+		lineageTag: 10000000-0000-0000-0000-000000000006
+
+	/// Revenue Growth %
+	/// Calculate percentage growth vs previous month
+	measure 'Revenue Growth %' =
+			VAR CurrentRevenue = [Total Sales]
+			VAR PreviousRevenue = [Previous Month Revenue]
+			RETURN
+			DIVIDE(
+			    CurrentRevenue - PreviousRevenue,
+			    PreviousRevenue,
+			    0
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 10000000-0000-0000-0000-000000000007
+
+	column order_id
+		dataType: string
+		lineageTag: cf9d68a9-4592-4b45-a491-e7973ab4a5ee
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_id
+		dataType: string
+		lineageTag: edc5ab8e-63db-43bd-be9f-b2e362b429dd
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_name
+		dataType: string
+		lineageTag: fbcf3d79-45d4-4bb5-bbbf-1e01818a24a9
+		summarizeBy: none
+		sourceColumn: customer_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column product
+		dataType: string
+		lineageTag: 590572c7-a8d5-49d9-b06a-ae409ffa958f
+		summarizeBy: none
+		sourceColumn: product
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		dataType: string
+		lineageTag: 97d12fb5-be15-4e7e-91c3-162c5ba307a9
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: 5e497e0b-7993-401c-9484-be6d4396e48c
+		summarizeBy: sum
+		sourceColumn: quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column unit_price
+		dataType: string
+		lineageTag: 1cc32810-45d9-4691-9ce5-57f292982f31
+		summarizeBy: none
+		sourceColumn: unit_price
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 7ce24fb5-2117-4c8c-b919-f90af2af02b3
+		summarizeBy: none
+		sourceColumn: order_date
+
+		variation Variation
+			isDefault
+			relationship: e5850baa-e223-41c9-adb8-8e35b7b30532
+			defaultHierarchy: LocalDateTable_6413b32e-2870-4ab4-a104-fd6d2e028fbb.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column region
+		dataType: string
+		lineageTag: cad2bcca-d0e0-4cf2-8b86-31011d9f7120
+		summarizeBy: none
+		sourceColumn: region
+
+		annotation SummarizationSetBy = Automatic
+
+	partition sales_sample = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Repoer\Bouvet\copilot-introduction\data\sales_sample.csv"),[Delimiter=",", Columns=9, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"order_id", type text}, {"customer_id", type text}, {"customer_name", type text}, {"product", type text}, {"category", type text}, {"quantity", Int64.Type}, {"unit_price", type text}, {"order_date", type date}, {"region", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table

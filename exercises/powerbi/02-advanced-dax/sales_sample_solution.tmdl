@@ -1,0 +1,119 @@
+/// ============================================================================
+/// Exercise 02 - Advanced DAX Challenges - SOLUTIONS
+/// ============================================================================
+/// These are the completed measures for Exercise 02
+/// This file shows only the measure definitions, not the full table structure
+
+table sales_sample
+
+	/// Challenge 1: Total Revenue with SUMX
+	/// Business requirement: Calculate total revenue across all orders
+	/// Revenue per row = quantity * unit_price (converted to number)
+	measure 'Total Revenue' =
+			SUMX(
+			    sales_sample,
+			    sales_sample[quantity] * VALUE(sales_sample[unit_price])
+			)
+		formatString: "$"#,0.00
+		lineageTag: 20000000-0000-0000-0000-000000000001
+
+	/// Challenge 2: Filtered Revenue with CALCULATE
+	/// Business requirement: Show revenue for "North" region only,
+	/// regardless of any region filter applied in the report
+	measure 'North Region Revenue' =
+			CALCULATE(
+			    [Total Revenue],
+			    sales_sample[region] = "North"
+			)
+		formatString: "$"#,0.00
+		lineageTag: 20000000-0000-0000-0000-000000000002
+
+	/// Challenge 3: Year-to-Date Revenue
+	/// Business requirement: Show cumulative revenue from the start of the current year
+	/// up to the latest date in the current filter context
+	measure 'YTD Revenue Ex2' =
+			TOTALYTD(
+			    [Total Revenue],
+			    sales_sample[order_date]
+			)
+		formatString: "$"#,0.00
+		lineageTag: 20000000-0000-0000-0000-000000000003
+
+	/// Challenge 4: Product Revenue Rank
+	/// Business requirement: Rank each product by its Total Revenue within
+	/// the current filter context (rank 1 = highest revenue product)
+	measure 'Product Rank by Revenue' =
+			RANKX(
+			    ALL(sales_sample[product]),
+			    [Total Revenue],
+			    ,
+			    DESC,
+			    DENSE
+			)
+		formatString: #,0
+		lineageTag: 20000000-0000-0000-0000-000000000004
+
+	/// Challenge 5: Top 10 Customers by Revenue
+	/// Business requirement: Calculate total revenue but only for the top 10 customers
+	/// (by their total revenue)
+	measure 'Top 10 Customers Revenue' =
+			CALCULATE(
+			    [Total Revenue],
+			    TOPN(
+			        10,
+			        ALL(sales_sample[customer_name]),
+			        [Total Revenue],
+			        DESC
+			    )
+			)
+		formatString: "$"#,0.00
+		lineageTag: 20000000-0000-0000-0000-000000000005
+
+	/// Challenge 6: Revenue vs Previous Month
+	/// Business requirement: Calculate the difference between current month revenue
+	/// and previous month revenue
+	measure 'Revenue Change vs Prev Month' =
+			VAR CurrentRevenue = [Total Revenue]
+			VAR PreviousRevenue = 
+			    CALCULATE(
+			        [Total Revenue],
+			        DATEADD(sales_sample[order_date], -1, MONTH)
+			    )
+			RETURN
+			CurrentRevenue - PreviousRevenue
+		formatString: "$"#,0.00
+		lineageTag: 20000000-0000-0000-0000-000000000006
+
+	/// Challenge 7: Average Order Value Ex2
+	/// Business requirement: Calculate the average revenue per unique order
+	measure 'Average Order Value Ex2' =
+			DIVIDE(
+			    [Total Revenue],
+			    DISTINCTCOUNT(sales_sample[order_id]),
+			    0
+			)
+		formatString: "$"#,0.00
+		lineageTag: 20000000-0000-0000-0000-000000000007
+
+	/// BONUS Challenge: Dynamic Period Comparison
+	/// Business requirement: Show revenue for the selected period compared to
+	/// the same period last year, showing both values and the % change
+	measure 'Revenue YoY Comparison' =
+			VAR CurrentRevenue = [Total Revenue]
+			VAR PreviousYearRevenue = 
+			    CALCULATE(
+			        [Total Revenue],
+			        SAMEPERIODLASTYEAR(sales_sample[order_date])
+			    )
+			VAR PercentageChange = 
+			    DIVIDE(
+			        CurrentRevenue - PreviousYearRevenue,
+			        PreviousYearRevenue,
+			        0
+			    )
+			RETURN
+			"Current: " & FORMAT(CurrentRevenue, "$#,0") & 
+			" | Last Year: " & FORMAT(PreviousYearRevenue, "$#,0") & 
+			" | Change: " & FORMAT(PercentageChange, "0.0%")
+		formatString: "$"#,0.00
+		lineageTag: 20000000-0000-0000-0000-000000000008

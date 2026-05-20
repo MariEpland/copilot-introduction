@@ -1,0 +1,29 @@
+/// ============================================================================
+/// Exercise 04 - GitHub Features - SOLUTION
+/// ============================================================================
+/// This is the FIXED version with proper error handling
+
+table sales_sample
+
+	/// Revenue Growth % Measure - FIXED!
+	/// 
+	/// This measure calculates the percentage change in revenue
+	/// compared to the previous month, with proper null/zero handling.
+	measure 'Revenue Growth %' =
+			VAR CurrentRevenue = [Total Revenue]
+			VAR PreviousRevenue = 
+			    CALCULATE(
+			        [Total Revenue],
+			        DATEADD(sales_sample[order_date], -1, MONTH)
+			    )
+			RETURN
+			-- FIXED: Use DIVIDE to handle division by zero/BLANK gracefully
+			DIVIDE(
+			    CurrentRevenue - PreviousRevenue,
+			    PreviousRevenue,
+			    BLANK()  -- Return BLANK when previous period has no revenue
+			)
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 40000000-0000-0000-0000-000000000001
+		
+		annotation PBI_FormatHint = {"isGeneralNumber":true}

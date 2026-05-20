@@ -1,0 +1,141 @@
+/// ============================================================================
+/// Exercise 05 - Skills & Slash Commands - CLEANED UP SOLUTION
+/// ============================================================================
+/// This is the cleaned-up version with:
+/// - Proper documentation
+/// - Consistent naming conventions
+/// - Bugs fixed
+/// - Readable formatting
+/// ============================================================================
+
+table sales_sample
+
+	/// Shortcut measure for Total Revenue
+	/// Returns the total revenue across all transactions
+	measure 'Revenue Shortcut' = [Total Revenue]
+		formatString: "$"#,0.00
+		lineageTag: 50000000-0000-0000-0000-000000000001
+
+	/// Average Order Value
+	/// Calculates the average revenue per unique order
+	/// Formula: Total Revenue ÷ Distinct Count of Orders
+	measure 'Average Order Value' =
+			DIVIDE(
+			    [Total Revenue],
+			    DISTINCTCOUNT(sales_sample[order_id]),
+			    BLANK()
+			)
+		formatString: "$"#,0.00
+		lineageTag: 50000000-0000-0000-0000-000000000002
+
+	/// Top Product Revenue
+	/// Returns the revenue for the single highest-revenue product
+	/// in the current filter context
+	measure 'Top Product Revenue' =
+			CALCULATE(
+			    [Total Revenue],
+			    TOPN(
+			        1,
+			        ALL(sales_sample[product]),
+			        [Total Revenue]
+			    )
+			)
+		formatString: "$"#,0.00
+		lineageTag: 50000000-0000-0000-0000-000000000003
+
+	/// Revenue Growth % (Month-over-Month)
+	/// Calculates percentage change in revenue vs previous month
+	/// Returns BLANK if previous month has no data
+	measure 'Revenue Growth % MoM' =
+			VAR CurrentRevenue = [Total Revenue]
+			VAR PreviousRevenue = 
+			    CALCULATE(
+			        [Total Revenue],
+			        DATEADD(sales_sample[order_date], -1, MONTH)
+			    )
+			RETURN
+			DIVIDE(
+			    CurrentRevenue - PreviousRevenue,
+			    PreviousRevenue,
+			    BLANK()
+			)
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 50000000-0000-0000-0000-000000000004
+
+	/// Total Customer Revenue
+	/// Sums revenue across all customers (same as Total Revenue,
+	/// but demonstrates row iteration pattern)
+	measure 'Total Customer Revenue' =
+			SUMX(
+			    VALUES(sales_sample[customer_id]),
+			    CALCULATE([Total Revenue])
+			)
+		formatString: "$"#,0.00
+		lineageTag: 50000000-0000-0000-0000-000000000005
+
+	/// Average Quantity Per Order
+	/// Calculates the average quantity of items per unique order
+	/// FIXED: Now uses DISTINCTCOUNT instead of COUNT for accurate order counting
+	measure 'Average Quantity Per Order' =
+			DIVIDE(
+			    SUM(sales_sample[quantity]),
+			    DISTINCTCOUNT(sales_sample[order_id]),
+			    0
+			)
+		formatString: #,0.00
+		lineageTag: 50000000-0000-0000-0000-000000000006
+
+	/// North Region Revenue
+	/// Returns total revenue for the North region only,
+	/// regardless of any region filter applied in the report
+	measure 'North Region Revenue' =
+			CALCULATE(
+			    [Total Revenue],
+			    sales_sample[region] = "North"
+			)
+		formatString: "$"#,0.00
+		lineageTag: 50000000-0000-0000-0000-000000000007
+
+	/// North Region Bonus Revenue
+	/// If viewing North region, adds 10% bonus to revenue.
+	/// Otherwise returns standard revenue.
+	/// Used for "what-if" bonus scenario analysis.
+	measure 'North Region Bonus Revenue' =
+			IF(
+			    SELECTEDVALUE(sales_sample[region]) = "North",
+			    [Total Revenue] * 1.1,
+			    [Total Revenue]
+			)
+		formatString: "$"#,0.00
+		lineageTag: 50000000-0000-0000-0000-000000000008
+
+	/// Total Revenue by Category
+	/// Sums revenue across all product categories
+	/// (Equivalent to Total Revenue, demonstrates category iteration)
+	measure 'Total Revenue by Category' =
+			SUMX(
+			    VALUES(sales_sample[category]),
+			    [Total Revenue]
+			)
+		formatString: "$"#,0.00
+		lineageTag: 50000000-0000-0000-0000-000000000009
+
+	/// Revenue Growth % (Year-over-Year)
+	/// Calculates percentage change in revenue vs same period last year
+	/// Returns BLANK if previous year has no data
+	/// FIXED: Now uses DIVIDE to handle division by zero
+	measure 'Revenue Growth % YoY' =
+			VAR CurrentRevenue = [Total Revenue]
+			VAR PreviousYearRevenue = 
+			    CALCULATE(
+			        [Total Revenue],
+			        DATEADD(sales_sample[order_date], -1, YEAR)
+			    )
+			RETURN
+			DIVIDE(
+			    CurrentRevenue - PreviousYearRevenue,
+			    PreviousYearRevenue,
+			    BLANK()
+			)
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 50000000-0000-0000-0000-000000000010
