@@ -22,9 +22,9 @@ This is the kind of skill you could use on real projects with dozens or hundreds
 
 ## Steps
 
-### 1. Examine the audit skill template
+### 1. Examine the audit skill
 
-Open [audit_my_semantic_model.prompt.md](audit_my_semantic_model.prompt.md).
+Open [audit-data-model/skill.md](audit-data-model/skill.md).
 
 This is a **comprehensive audit skill** that checks:
 - Error handling (DIVIDE vs `/`, BLANK handling)
@@ -35,6 +35,7 @@ This is a **comprehensive audit skill** that checks:
 - Data quality (hard-coded values, type conversions)
 
 **Read through the entire file.** Notice:
+- The YAML frontmatter (`name` and `description`)
 - The detailed checklist (6 categories)
 - The structured audit report format
 - The response style guidelines
@@ -54,16 +55,24 @@ Or add a rule about specific DAX patterns your team uses.
 
 **Save your changes** if you customize it.
 
-### 3. Prepare the semantic model for audit
+### 3. Inspect the Power BI model 
 
-Open the PBIP project in Power BI Desktop: [Sales_sample.pbip](Sales_sample.pbip)
+You can inspect the semantic model in two ways:
 
-> ⚠️ **Before opening in Power BI Desktop**, you must update the Power Query source path to point to `sales_sample.csv` on your computer.
+**Option A — Open in Power BI Desktop:**
+
+Open the PBIP project: [Sales_sample.pbip](Sales_sample.pbip)
+
+> ⚠️ **Before opening**, you must update the Power Query source path to point to `sales_sample.csv` on your computer.
 >
 > Open [sales_sample.tmdl](Sales_sample.SemanticModel/definition/tables/sales_sample.tmdl) and find the `File.Contents(...)` line in the partition query. Replace the path with the actual location where you saved the file, e.g.:
 > ```
 > File.Contents("C:\your\path\to\sales_sample.csv")
 > ```
+
+**Option B — Inspect the TMDL file directly:**
+
+Open [sales_sample.tmdl](Sales_sample.SemanticModel/definition/tables/sales_sample.tmdl) in VS Code. All measures and their definitions are visible as plain text.
 
 The semantic model contains measures that intentionally violate best practices:
 - Measures with poor names (`rev`, `X`, `avg`)
@@ -72,15 +81,32 @@ The semantic model contains measures that intentionally violate best practices:
 - Repeated calculations without VAR
 - Hard-coded filter values
 
-You can also open the underlying TMDL file to see the raw definitions:
-[sales_sample.tmdl](Sales_sample.SemanticModel/definition/tables/sales_sample.tmdl)
+### 4. Create your audit skill
 
-### 4. Attach the skill and run the audit
+In this step you'll create a reusable prompt (skill) and place it under `.github/skills/` in the workspace. Choose one approach:
 
-Open Copilot Chat and attach your audit skill:
+**Option A — Copy the provided skill:**
+1. Create the folder `.github/skills/audit-data-model/` in the workspace root
+2. Copy `audit-data-model/skill.md` from this exercise folder into it
 
-1. Type `#file` and select `audit_my_semantic_model.prompt.md`
-2. Also attach the semantic model file: type `#file` and select `exercises/powerbi/bonus/Sales_sample.SemanticModel/definition/tables/sales_sample.tmdl`
+**Option B — Write your own from scratch:**
+1. Create `.github/skills/audit-data-model/skill.md`
+2. Add YAML frontmatter with `name` and `description`
+3. Write your own audit checklist and report format (use the provided skill as inspiration)
+
+**Option C — Ask Copilot to generate one:**
+1. Open Copilot Chat and ask:
+   > "Create a skill file at `.github/skills/audit-data-model/skill.md` that audits DAX measures for error handling, naming, documentation, formatting, and performance issues. Use YAML frontmatter with name and description."
+2. Review and tweak the output
+
+---
+
+### 5. Run the audit
+
+**Start a new Copilot Chat session** (Ctrl+L) so it picks up the new skill.
+
+1. Type `/audit-data-model`
+2. Attach the semantic model file: type `#file` and select `exercises/powerbi/bonus/Sales_sample.SemanticModel/definition/tables/sales_sample.tmdl`
 3. Then ask:
 
 ```
@@ -97,7 +123,7 @@ Save the audit report to exercises/powerbi/bonus/audit_report.md
 - ✅ Categorize issues as Critical 🔴 / Warning ⚠️ / Good ✅
 - ✅ Save the report to `audit_report.md` in this folder
 
-### 5. Review the audit report
+### 6. Review the audit report
 
 Open [audit_report.md](audit_report.md) (Copilot should have created this file).
 
@@ -114,7 +140,7 @@ The report should contain sections like:
 
 
 
-### 6. (Optional) Fix the issues
+### 7. (Optional) Fix the issues
 
 Based on the audit findings, go fix the critical issues! Use Copilot to do this. 
 
