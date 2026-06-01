@@ -24,7 +24,7 @@ This is the kind of skill you could use on real projects with dozens or hundreds
 
 ### 1. Examine the audit skill
 
-Open [audit-data-model/skill.md](audit-data-model/skill.md).
+Open [audit-data-model/SKILL.md](audit-data-model/SKILL.md).
 
 This is a **comprehensive audit skill** that checks:
 - Error handling (DIVIDE vs `/`, BLANK handling)
