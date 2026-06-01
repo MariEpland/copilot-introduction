@@ -1,0 +1,31 @@
+table sales_sample
+	lineageTag: 30000000-0000-0000-0000-000000000001
+
+	/// TODO: Ask Copilot to write your "% Product Contribution" measure here
+	measure '% Product Contribution' = BLANK()
+		formatString: 0.0%
+		lineageTag: 30000000-0000-0000-0000-000000000002
+
+	column order_id
+		dataType: string
+		lineageTag: 30000000-0000-0000-0000-000000000010
+		summarizeBy: none
+		sourceColumn: order_id
+
+	column product
+		dataType: string
+		lineageTag: 30000000-0000-0000-0000-000000000013
+		summarizeBy: none
+		sourceColumn: product
+
+	column quantity
+		dataType: int64
+		lineageTag: 30000000-0000-0000-0000-000000000011
+		summarizeBy: sum
+		sourceColumn: quantity
+
+	column unit_price
+		dataType: double
+		lineageTag: 30000000-0000-0000-0000-000000000012
+		summarizeBy: sum
+		sourceColumn: unit_price

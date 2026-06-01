@@ -21,13 +21,14 @@ First, let's see how Copilot behaves without any custom instructions.
 
 Open Copilot Chat and ask:
 
-> "Write a DAX measure to calculate average revenue per order. Revenue is quantity × unit_price."
+> "Write a measure that calculates the percentage of total sales contributed by the current product"
 
 **Observe:**
-- Does it use `/` or `DIVIDE()`?
-- Does it include comments?
-- What's the formatting style?
-- Does it include a format string?
+- What did it name the measure?
+- Does it include a `///` description comment?
+- Does it include a `formatString`?
+- Does it add a `displayFolder` annotation?
+- Is the output in TMDL format or just raw DAX?
 
 Keep this response visible for comparison.
 
@@ -43,11 +44,11 @@ Copy `instructions_template_powerbi.md` to `.github/copilot-instructions.md` in 
 
 Then open `.github/copilot-instructions.md` and make at least **three changes** that reflect your Power BI development preferences:
 
-- ✏️ Add a rule: **"Always use DIVIDE() instead of the / operator for division"**
-- ✏️ Add a rule: **"Always include a description comment above each measure"**
-- ✏️ Add a naming convention (e.g., prefix aggregations with "Total", percentages with "%")
-- ✏️ Add a formatting rule (always include formatString, specific number formats)
-- ✏️ Define your measure organization strategy (display folders)
+- ✏️ Add a rule: **"Always output DAX measures in TMDL format (with measure keyword, formatString, and lineageTag placeholder)"**
+- ✏️ Add a rule: **"Always include a `///` description comment above each measure explaining the business purpose"**
+- ✏️ Add a naming convention: **"Prefix percentage measure names with `% ` (e.g., `% Product Contribution`)"**
+- ✏️ Add a formatting rule: **"Percentage measures must use `formatString: 0.0%`"**
+- ✏️ Add a display folder rule: **"Assign percentage/KPI measures to `displayFolder: KPIs`"**
 
 **Save the file** when done.
 
@@ -61,13 +62,14 @@ Now test the same prompt with your custom instructions in place.
 
 Ask the **exact same question**:
 
-> "Write a DAX measure to calculate average revenue per order. Revenue is quantity × unit_price."
+> "Write a measure that calculates the percentage of total sales contributed by the current product"
 
 **Compare:**
-- Does it now use `DIVIDE()` instead of `/`?
-- Does it include a description comment above the measure?
-- Does the formatting match your style preferences?
-- Does it follow your naming conventions?
+- Does it now use your naming convention (e.g., `% Product Contribution`)?
+- Does it include a `///` description comment above the measure?
+- Does it include `formatString: 0.0%`?
+- Does it add `displayFolder: KPIs`?
+- Is it now in TMDL format?
 
 ---
 
