@@ -13,14 +13,11 @@
 
 table sales_sample
 
-	/// Revenue Growth % Measure - Contains a Bug!
+	/// % Revenue Growth Measure - This is one of Mari's measures.
 	/// 
 	/// This measure calculates the percentage change in revenue
-	/// compared to the previous month. However, it has a bug
-	/// that causes errors in certain scenarios.
-	/// 
-	/// Can you find and fix the bug?
-	measure 'Revenue Growth %' =
+	/// compared to the previous month.
+	measure '% Revenue Growth' =
 			VAR CurrentRevenue = [Total Revenue]
 			VAR PreviousRevenue = 
 			    CALCULATE(
@@ -28,7 +25,7 @@ table sales_sample
 			        DATEADD(sales_sample[order_date], -1, MONTH)
 			    )
 			RETURN
-			-- BUG: This division will fail when PreviousRevenue is 0 or BLANK
-			(CurrentRevenue - PreviousRevenue) / PreviousRevenue
-		formatString: 0.0%;-0.0%;0.0%
+			    DIVIDE(CurrentRevenue - PreviousRevenue, PreviousRevenue, 0)
+		formatString: 0.0%
+		displayFolder: KPIs
 		lineageTag: 40000000-0000-0000-0000-000000000001
